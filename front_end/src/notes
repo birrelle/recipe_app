@@ -1,0 +1,262 @@
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* font-family: Arial, sans-serif; */
+  font-family: 'Poppins',  sans-serif;
+  font-display: block;
+}
+
+.app-header {
+  background-color: #ffffff;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: #2d3f5d;
+  filter: drop-shadow(4px 4px 6px rgba(113, 128, 150, 0.5) );
+}
+
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Space between logo and menu */
+  align-items: center; /* Center vertically */
+  padding: 0; /* Add some padding */
+  background-color: #ffffff; /* Background color */
+}
+
+.navbar h1 {
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 1.7em;
+}
+
+
+/* Menu styling */
+.menu {
+  list-style: none; /* Remove bullet points */
+  display: flex; /* Display as a flex container */
+}
+
+.menu li {
+  margin-left: 1rem; /* Space between menu items */
+}
+
+.menu a {
+  color: #2d3f5d;
+  text-decoration: none; /* Remove underline */
+  transition: color 0.3s; /* Smooth transition */
+}
+
+.menu a:hover {
+  color: #000000; /* Change color on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 200px) {
+  .menu {
+      flex-direction: row; /* Stack menu items vertically */
+      position: absolute; /* Position the menu */
+      right: 0; /* Align to the right */
+      background-color: #ffffff; /* Background for dropdown */
+      width: 100%; /* Full width */
+      display: none /* Hide menu by default */
+  }
+
+  .navbar.active .menu {
+      display: flex; /* Show menu when active */
+  }
+
+  .menu li {
+      margin: 1rem 0; /* Space for vertical items */
+  }
+
+ 
+}
+
+.app-main {
+  flex-grow: 1;
+  padding: 20px;
+  text-align: center;
+}
+
+
+.search-container {
+  position: relative;
+  padding: 20px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;  /* Center the search bar */
+  transition: top 0.3s;
+}
+
+.search-bar.fixed {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);  /* Center the search bar */
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-bar button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.search-bar button:hover {
+  background-color: #555;
+}
+
+.filters {
+  margin-top: 10px;  /* Space between the search bar and filters 
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+} 
+
+
+
+
+
+/* .cta-button {
+  background-color: #61dafb;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+} */
+
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+}
