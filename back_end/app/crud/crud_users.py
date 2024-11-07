@@ -1,12 +1,13 @@
 from app.database.db import users_collection
 from pymongo.errors import PyMongoError
-from app.schemas import UserSchema
-from app.schemas import PyObjectId
+from app.schemas import User
+from typing import List
+from app.utils import PyObjectId
 
 # CRUD Operations for Users
 
 # CREATE: Insert a new user
-def create_user(user_data: UserSchema) -> str:
+def create_user(user_data: User) -> str:
     try:
         result = users_collection.insert_one(user_data.dict())
         if not result.inserted_id:
@@ -20,7 +21,7 @@ def create_user(user_data: UserSchema) -> str:
 
 
 # READ: Get a user by ID
-def get_user_by_id(user_id: str) -> UserSchema:
+def get_user_by_id(user_id: str) -> User:
     try:
         if not PyObjectId.is_valid(user_id):
             raise Exception("Invalid user ID", 400)
@@ -36,8 +37,26 @@ def get_user_by_id(user_id: str) -> UserSchema:
         print(f"MongoDB retrieval error: {e}")
         raise PyMongoError("An error occurred while retrieving the recipe", 500)
 
+# READ: Get all users
+def get_all_users() -> List[User]:
+    try:
+        users = users_collection.find({})
+
+        if not users:
+            return []
+
+        for user in users:
+            user['id'] = str(user['id'])
+            user = User(**user)
+
+        return users
+    
+    except PyMongoError as e:
+        print(f"MongoDB retrieval error: {e}")
+        raise PyMongoError("An error occurred while retrieving the collections", 500)
+
 # UPDATE: Update a user by ID
-def update_user(user_id: str, updated_data: UserSchema):
+def update_user(user_id: str, updated_data: User):
     try:
         if not PyObjectId.is_valid(user_id):
             raise Exception("Invalid user ID", 400)

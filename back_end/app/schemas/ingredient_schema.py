@@ -8,3 +8,15 @@ class Ingredient(BaseModel):
     name: str = Field(..., min_length=1, description="Name of the ingredient")
     is_optional: bool = Field(default=False, description="Flag to mark if ingredient is optional")
     section: Optional[str] = Field(None, min_length=1, description="The section to which the ingredient belongs")
+
+    class Config:
+       schema_extra = {
+            "example": {
+                "order": 1,
+                "quantity": "1 1/2",
+                "unit": "cups",
+                "name": "sauce",
+                "is_optional": False,
+                "section": "Sauce"
+            }
+        }

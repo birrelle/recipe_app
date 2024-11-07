@@ -79,3 +79,10 @@ brew services start mongodb-community@8.0
 stop mongo
 brew services stop mongodb-community@8.0
 >>>>>>> tmp
+
+
+export FLASK_APP=app.py
+export FLASK_DEBUG=1
+flask run
+
+Flask should now be running at http://127.0.0.1:5000 by default.

@@ -12,6 +12,10 @@ class Course(Enum):
     SNACK = "Snack"
     VEGETARIAN = "Vegetarian"
 
+class SearchType(Enum):
+    RECIPE = "Recipe"
+    INGREDIENT = "Ingredient"
+
 # class Ing_unit(Enum):
 #     CUP = "Cup"
 #     TEASPOON = "Teaspoon"

@@ -5,10 +5,10 @@ from app.schemas.ingredient_schema import Ingredient
 from app.schemas.direction_schema import Direction
 from app.schemas.section_schema import Section
 from datetime import datetime, timezone
-from app.schemas import PyObjectId
+from app.utils import PyObjectId
 
 # Define the Recipe schema using Pydantic
-class RecipesSchema(BaseModel):
+class Recipe(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId)
     title: str = Field(..., min_length=1, max_length=100, description="Name of the recipe")
     user_id: PyObjectId
@@ -33,7 +33,7 @@ class RecipesSchema(BaseModel):
         schema_extra = {
             "example": {
                 "title": "Pasta Primavera",
-                "user": "user_id",
+                "user_id": "user_id",
                 "source": "Budget Bytes",
                 "course": ["Dinner"],
                 "ingredients": [
@@ -63,14 +63,14 @@ class RecipesSchema(BaseModel):
                     }
                 ],
                 "sections": [
-                    {"order": 1, "name": "Pasta"},
-                    {"order": 2, "name": "Sauce"}
+                    {"order": 1, "name": "Pasta", "is_optional": False},
+                    {"order": 2, "name": "Sauce", "is_optional": False}
                 ],
                 "directions": [
-                    {"order": 1, "direction": "Boil water"},
-                    {"order": 2, "direction": "Make pasta"},
-                    {"order": 3, "direction": "Make sauce"},
-                    {"order": 3, "direction": "Mix and serve warm"}
+                    {"order": 1, "direction": "Boil water", "is_optional": False},
+                    {"order": 2, "direction": "Make pasta", "is_optional": False},
+                    {"order": 3, "direction": "Make sauce", "is_optional": False},
+                    {"order": 3, "direction": "Mix and serve warm", "is_optional": False}
                 ],
                 "serving_size": 4,
                 "prep_time": 20,

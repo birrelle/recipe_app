@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import List, Set, Optional
 from datetime import datetime, timezone
-from app.schemas import PyObjectId
+from app.utils import PyObjectId
 
-class UserSchema(BaseModel):
+class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId)
     username: str = Field(..., min_length=1, max_length=100, description="User's username")
     collection_ids: Optional[List[str]] = Field(None, description="store the collection IDs related to the user")

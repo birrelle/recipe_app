@@ -1,12 +1,13 @@
-from app.schemas import PyObjectId
+from app.utils import PyObjectId
 from app.database.db import collections_collection
 from pymongo.errors import PyMongoError
-from app.schemas import CollectionsSchema
+from typing import List
+from app.schemas import Collection
 
 # CRUD Operations for Collections
 
 # CREATE: Insert a new collection
-def create_collection(collection_data: CollectionsSchema) -> str:
+def create_collection(collection_data: Collection) -> str:
     try:
         result = collections_collection.insert_one(collection_data.dict())
         if not result.inserted_id:
@@ -21,7 +22,7 @@ def create_collection(collection_data: CollectionsSchema) -> str:
 
 
 # READ: Get a collection by ID
-def get_collection_by_id(collections_id: str) -> CollectionsSchema:
+def get_collection_by_id(collections_id: str) -> Collection:
     try:
         if not PyObjectId.is_valid(collections_id):
             raise Exception("Invalid collection ID", 400)
@@ -36,9 +37,50 @@ def get_collection_by_id(collections_id: str) -> CollectionsSchema:
     except PyMongoError as e:
         print(f"MongoDB retrieval error: {e}")
         raise PyMongoError("An error occurred while retrieving the collection", 500)
+    
+# READ: Get all collections for a given user
+def get_all_collections_by_user(user_id: str) -> List[Collection]:
+    try:
+        if not PyObjectId.is_valid(user_id):
+            raise Exception("Invalid user ID", 400)
+        
+        collections = collections_collection.find({"user_id": PyObjectId(user_id)})
+
+        if not collections:
+            return []
+        
+        for collection in collections:
+            collection['id'] = str(collection['id'])
+            collection['user_id'] = str(collection['user_id'])
+            collection = Collection(**collection)
+
+        return collections
+    
+    except PyMongoError as e:
+        print(f"MongoDB retrieval error: {e}")
+        raise PyMongoError("An error occurred while retrieving the collections", 500)
+
+# READ: Get all collections
+def get_all_collections() -> List[Collection]:
+    try:
+        collections = collections_collection.find({})
+
+        if not collections:
+            return []
+        
+        for collection in collections:
+            collection['id'] = str(collection['id'])
+            collection['user_id'] = str(collection['user_id'])
+            collection = Collection(**collection)
+
+        return collections
+    
+    except PyMongoError as e:
+        print(f"MongoDB retrieval error: {e}")
+        raise PyMongoError("An error occurred while retrieving the collections", 500)
 
 # UPDATE: Update a collection by ID
-def update_collection(collection_id: str, updated_data: CollectionsSchema):
+def update_collection(collection_id: str, updated_data: Collection):
     try:
         if not PyObjectId.is_valid(collection_id):
             raise Exception("Invalid collection ID", 400)

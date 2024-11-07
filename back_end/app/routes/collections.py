@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from app.crud import crud_collections
 from pymongo.errors import PyMongoError
-from app.schemas import CollectionsSchema
+from app.schemas import Collection
+from typing import List
 
 # Define a Blueprint for the 'collections' routes
 collections_bp = Blueprint('collections', __name__)
@@ -11,12 +12,14 @@ collections_bp = Blueprint('collections', __name__)
 def create_new_collection():
     try:
         data = request.json
-        collection = CollectionsSchema(**data)
+        collection = Collection(**data)
 
         if not collection:
             raise Exception("Invalid input: No data provided", 400)
 
-        collection_id = crud_collections.create_collection(collection)
+        collection_id = crud_collections.create_collection(collection=collection)
+
+        print("collection_id", collection_id)
         return jsonify({"id": collection_id, "message": "Collection created successfully"})
 
     except PyMongoError as e:
@@ -28,9 +31,9 @@ def create_new_collection():
 
 # READ collection by ID endpoint
 @collections_bp.route('/<collection_id>', methods=['GET'])
-def get_collection(collection_id):
+def get_collection(collection_id: str):
     try:
-        collection = crud_collections.get_collection_by_id(collection_id)
+        collection = crud_collections.get_collection_by_id(collection_id=collection_id)
         return jsonify(collection)
 
     except PyMongoError as e:
@@ -40,17 +43,72 @@ def get_collection(collection_id):
         print(f"An unexpected error occurred: {str(e)}", 500)
         raise Exception(f"An unexpected error occurred: {str(e)}", 500)
 
+# READ all collections for a user
+@collections_bp.route('/user/<user_id>', methods=['GET'])
+def get_all_collections_for_user(user_id: str):
+    try:
+        collections = crud_collections.get_all_collections_by_user(user_id=user_id)
+        print("Collections", collections)
+
+        return jsonify(collections)
+    
+    except PyMongoError as e:
+        print(f"Database error occurred: {str(e)}", 500)
+        raise PyMongoError(f"Database error occurred: {str(e)}", 500)
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", 500)
+        raise Exception(f"An unexpected error occurred: {str(e)}", 500)
+
+# READ all collections
+@collections_bp.route('/all', methods=['GET'])
+def get_all_collections():
+    try:
+        collections = crud_collections.get_all_collections()
+        print("Collections", collections)
+
+        return jsonify(collections)
+    
+    except PyMongoError as e:
+        print(f"Database error occurred: {str(e)}", 500)
+        raise PyMongoError(f"Database error occurred: {str(e)}", 500)
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", 500)
+        raise Exception(f"An unexpected error occurred: {str(e)}", 500)
+
 # UPDATE collection endpoint
 @collections_bp.route('/<collection_id>', methods=['PUT'])
-def update_existing_collection(collection_id):
+def update_existing_collection(collection_id: str):
     try:
         data = request.json
-        collection = CollectionsSchema(**data)
+        collection = Collection(**data)
 
         if not collection:
             raise Exception("Invalid input: No data provided", 400)
 
-        response = crud_collections.update_collection(collection_id, collection)
+        response = crud_collections.update_collection(collection_id=collection_id, collection=collection)
+        return jsonify(response)
+
+    except PyMongoError as e:
+        print(f"Database error occurred: {str(e)}", 500)
+        raise PyMongoError(f"Database error occurred: {str(e)}", 500)
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", 500)
+        raise Exception(f"An unexpected error occurred: {str(e)}", 500)
+
+# UPDATE add recipe to collection endpoint
+@collections_bp.route('/<collection_id>', methods=['PUT'])
+def update_existing_collection(collection_id: str, recipe_ids: List[str]):
+    try:
+        collection = crud_collections.get_collection_by_id(collections_id=collection_id)
+        
+        recipe_id_list = collection.recipe_ids
+        for recipe_id in recipe_ids:
+            if recipe_id not in recipe_id_list:
+                recipe_id_list.append(recipe_id)
+
+        collection.recipe_ids = recipe_id_list
+
+        response = crud_collections.update_collection(collection_id=collection_id, collection=collection)
         return jsonify(response)
 
     except PyMongoError as e:
@@ -62,9 +120,9 @@ def update_existing_collection(collection_id):
 
 # DELETE collection by ID endpoint
 @collections_bp.route('/<collection_id>', methods=['DELETE'])
-def delete_collection_by_id(collection_id):
+def delete_collection_by_id(collection_id: str):
     try:
-        response = crud_collections.delete_collection(collection_id)
+        response = crud_collections.delete_collection(collection_id=collection_id)
         return jsonify(response)
 
     except PyMongoError as e:

@@ -17,7 +17,8 @@ users_collection = db["users"]
 recipes_collection = db["recipes"]
 collections_collection = db["collections"]
 
-recipes_collection.create_index([('ingredients', 1)], sparse=True, background=True)
+recipes_collection.create_index([('ingredients.name', 'text')])
+recipes_collection.create_index([('name', 'text')])
 users_collection.create_index([('username', 1)], unique=True)
 
 def get_db():
