@@ -4,28 +4,37 @@ from flask_cors import CORS
 from app.routes import recipes_bp, users_bp, collections_bp
 
 # Initialize Flask app and enable CORS
-app = Flask(__name__)
-CORS(app)
+# app = Flask(__name__)
+# CORS(app)
 
 #Register Blueprints
-app.register_blueprint(recipes_bp, url_prefix="/recipes")
-app.register_blueprint(users_bp, url_prefix="/users")
-app.register_blueprint(collections_bp, url_prefix="/collections")
+# app.register_blueprint(recipes_bp, url_prefix="/recipes")
+# app.register_blueprint(users_bp, url_prefix="/users")
+# app.register_blueprint(collections_bp, url_prefix="/collections")
 
-#NOT SURE IF THIS DOES ANYTHING
-# Global error handler
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # Default to 500 if no specific code is set
-    code = 500
-    if hasattr(e, 'code'):
-        code = e.code
+# #NOT SURE IF THIS DOES ANYTHING
+# # Global error handler
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     # Default to 500 if no specific code is set
+#     code = 500
+#     if hasattr(e, 'code'):
+#         code = e.code
 
-    return jsonify({
-        "message": str(e),
-        "error": type(e).__name__,
-        "status": code
-    }), code
+#     return jsonify({
+#         "message": str(e),
+#         "error": type(e).__name__,
+#         "status": code
+#     }), code
+
+
+
+import os
+from app import create_app
+
+# Load the environment variable for the Flask app
+app = create_app(os.getenv('FLASK_ENV', 'development'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Run the Flask application
+    app.run()

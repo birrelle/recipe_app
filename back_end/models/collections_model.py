@@ -17,4 +17,4 @@ class CollectionsModel(BaseModel):
         }
 
 class CollectionsInDB(CollectionsModel):
-    id: str
+    _id: str

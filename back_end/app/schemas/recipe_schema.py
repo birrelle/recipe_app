@@ -6,11 +6,12 @@ from app.schemas.direction_schema import Direction
 from app.schemas.section_schema import Section
 from datetime import datetime, timezone
 from app.utils import PyObjectId
+from bson import ObjectId
 
 # Define the Recipe schema using Pydantic
 class Recipe(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId)
-    title: str = Field(..., min_length=1, max_length=100, description="Name of the recipe")
+    id: PyObjectId = Field(alias='_id', default_factory=PyObjectId)
+    title: str
     user_id: PyObjectId
     source: Optional[str] = Field(None, min_length=1, description="Where the recipe came from")
     course: Optional[List[Course]] 
@@ -29,7 +30,7 @@ class Recipe(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         use_enum_values = True  
-        json_encoders = {PyObjectId: str}
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "title": "Pasta Primavera",

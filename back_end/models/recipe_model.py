@@ -21,7 +21,7 @@ class RecipesModel(BaseModel):
     created_at: datetime = datetime.now()
     
     class Config:
-        arbitrary_types_allowed = True
+        # arbitrary_types_allowed = True
         use_enum_values = True  
         schema_extra = {
             "example": {
@@ -76,4 +76,4 @@ class RecipesModel(BaseModel):
         }
 
 class RecipesInDB(RecipesModel):
-    id: str
+    _id: str

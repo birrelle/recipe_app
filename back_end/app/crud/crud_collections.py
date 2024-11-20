@@ -1,14 +1,20 @@
-from app.utils import PyObjectId
 from app.database.db import collections_collection
 from pymongo.errors import PyMongoError
 from typing import List
 from app.schemas import Collection
+from app.utils import PyObjectId
 
 # CRUD Operations for Collections
 
 # CREATE: Insert a new collection
 def create_collection(collection_data: Collection) -> str:
     try:
+        try:
+            collection_data = Collection(**collection_data)
+        except ValueError as e:
+            print(f"Invalid Collection object")
+            raise ValueError(e)
+
         result = collections_collection.insert_one(collection_data.dict())
         if not result.inserted_id:
             raise Exception("Failed to insert collection", 500)
@@ -27,12 +33,12 @@ def get_collection_by_id(collections_id: str) -> Collection:
         if not PyObjectId.is_valid(collections_id):
             raise Exception("Invalid collection ID", 400)
         
-        collection = collections_collection.find_one({"id": PyObjectId(collections_id)})
+        collection = collections_collection.find_one({"_id": PyObjectId(collections_id)})
         if not collection:
             raise Exception("Collection not found", 404)
         
-        collection["id"] = str(collection["id"])  # Convert ObjectId to string for JSON serialization
-        return collection
+        # collection["id"] = str(collection["id"])  # Convert PyObjectId to string for JSON serialization
+        return Collection(**collection)
 
     except PyMongoError as e:
         print(f"MongoDB retrieval error: {e}")
@@ -44,34 +50,57 @@ def get_all_collections_by_user(user_id: str) -> List[Collection]:
         if not PyObjectId.is_valid(user_id):
             raise Exception("Invalid user ID", 400)
         
-        collections = collections_collection.find({"user_id": PyObjectId(user_id)})
+        coll = get_all_collections()
+        cursor = collections_collection.find({"user_id": PyObjectId(user_id)})
 
-        if not collections:
-            return []
-        
-        for collection in collections:
-            collection['id'] = str(collection['id'])
-            collection['user_id'] = str(collection['user_id'])
+        collections = []
+        for collection in list(cursor):
+            # collection['id'] = str(collection['id'])
+            # collection['user_id'] = str(collection['user_id'])
             collection = Collection(**collection)
+            collections.append(collection)
 
         return collections
     
     except PyMongoError as e:
         print(f"MongoDB retrieval error: {e}")
         raise PyMongoError("An error occurred while retrieving the collections", 500)
+    
+# READ: Get multiple collections by ID
+def get_many_collections_by_id(collection_ids: List[str]) -> List[Collection]:
+    try:
+        object_ids = []
+        for collection_id in collection_ids:
+            if not PyObjectId.is_valid(collection_id):
+                raise Exception("Invalid collection ID", 400)
+            object_ids.append(PyObjectId(collection_id))
+        
+        cursor = collections_collection.find({"_id": {"$in": object_ids}})
+        
+        collections = []
+        for collection in cursor:
+            # collection['id'] = str(collection['id'])
+            # collection['user_id'] = str(collection['user_id'])
+            collection = Collection(**collection)
+            collections.append(collection)
+        
+        return collections
+    
+    except PyMongoError as e:
+        print(f"MongoDB retrieval error: {e}")
+        raise PyMongoError("An error occurred while retrieving the recipes", 500)
 
 # READ: Get all collections
 def get_all_collections() -> List[Collection]:
     try:
-        collections = collections_collection.find({})
+        cursor = collections_collection.find({})
 
-        if not collections:
-            return []
-        
-        for collection in collections:
-            collection['id'] = str(collection['id'])
-            collection['user_id'] = str(collection['user_id'])
+        collections = []
+        for collection in list(cursor):
+            # collection['id'] = str(collection['id'])
+            # collection['user_id'] = str(collection['user_id'])
             collection = Collection(**collection)
+            collections.append(collection)
 
         return collections
     
@@ -82,11 +111,17 @@ def get_all_collections() -> List[Collection]:
 # UPDATE: Update a collection by ID
 def update_collection(collection_id: str, updated_data: Collection):
     try:
+        try:
+            updated_data = Collection(**updated_data)
+        except ValueError as e:
+            print(f"Invalid Collection object")
+            raise ValueError(e)
+        
         if not PyObjectId.is_valid(collection_id):
             raise Exception("Invalid collection ID", 400)
         
         result = collections_collection.update_one(
-            {"id": PyObjectId(collection_id)},
+            {"_id": PyObjectId(collection_id)},
             {"$set": updated_data.dict()}
         )
         if result.matched_count == 0:
@@ -104,7 +139,7 @@ def delete_collection(collection_id: str):
         if not PyObjectId.is_valid(collection_id):
             raise Exception("Invalid collection ID", 400)
         
-        result = collections_collection.delete_one({"id": PyObjectId(collection_id)})
+        result = collections_collection.delete_one({"_id": PyObjectId(collection_id)})
         if result.deleted_count == 0:
             raise Exception("Collection not found", 404)
         
@@ -113,3 +148,14 @@ def delete_collection(collection_id: str):
     except PyMongoError as e:
         print(f"MongoDB deletion error: {e}")
         raise PyMongoError("An error occurred while deleting the collection", 500)
+
+# DELETE: Delete all collections
+def delete_all_collections():
+    try:
+        collections_collection.delete_many({})
+
+        return {"message": "Collections deleted successfully"}
+
+    except PyMongoError as e:
+        print(f"MongoDB deletion error: {e}")
+        raise PyMongoError("An error occurred while deleting the collections", 500)

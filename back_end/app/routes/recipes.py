@@ -18,10 +18,10 @@ def create_new_recipe():
         if not recipe:
             raise Exception("Invalid input: No data provided", 400)
 
-        recipe_id = crud_recipes.create_recipe(recipe=recipe)
-        print("ID", recipe_id)
+        recipe: Recipe = crud_recipes.create_recipe(recipe=recipe)
+        print("ID", recipe['id'])
 
-        return jsonify({"id": recipe_id, "message": "Recipe created successfully"})
+        return jsonify({"id": recipe['id'], "message": "Recipe created successfully"})
 
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)

@@ -96,8 +96,8 @@ def update_existing_collection(collection_id: str):
         raise Exception(f"An unexpected error occurred: {str(e)}", 500)
 
 # UPDATE add recipe to collection endpoint
-@collections_bp.route('/<collection_id>', methods=['PUT'])
-def update_existing_collection(collection_id: str, recipe_ids: List[str]):
+@collections_bp.route('/<collection_id>/add_recipes', methods=['PUT'])
+def add_recipes_to_collection(collection_id: str, recipe_ids: List[str]):
     try:
         collection = crud_collections.get_collection_by_id(collections_id=collection_id)
         

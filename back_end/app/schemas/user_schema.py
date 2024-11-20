@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from app.utils import PyObjectId
 
 class User(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId)
+    id: PyObjectId = Field(alias='_id', default_factory=PyObjectId)
     username: str = Field(..., min_length=1, max_length=100, description="User's username")
     collection_ids: Optional[List[str]] = Field(None, description="store the collection IDs related to the user")
     recipe_ids: Optional[List[str]] = Field(None, description="Store the recipe IDs related to the user")
