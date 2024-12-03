@@ -19,14 +19,6 @@ bad_collection_2 = {"user_id": "672af6cd3d7885e1b7eaf6d4",
 updated_collection = {"name": "Favorite Desserts",
                 "user_id": "673939ecbce83aa91d4e20ab",
                 "recipe_ids": ["673939ecbce83aa91d4e20aa", "673939e155abdf31fbf15fef", "673939e155abdf31fbf15ff0"]}
-
-app = Flask(__name__)
-app.config.from_object(TestingConfig)
-
-@pytest.fixture
-def client():
-    with app.test_client() as client:
-        yield client
         
 def test_create_collection():
     # Test correct insertion
@@ -98,7 +90,7 @@ def test_get_multiple_collections_by_id():
 
     response = crud_collections.get_many_collections_by_id(collection_ids=[collection_id_1, collection_id_2])
     for item in response:
-        assert str(item.id) in [collection_id_1, collection_id_2]
+        assert str(item.collection_id) in [collection_id_1, collection_id_2]
     
     response = sorted(response, key=lambda item: item.name)
     assert response[0].name == "Favorite Desserts"
@@ -119,6 +111,9 @@ def test_update_collection():
     crud_collections.delete_all_collections()
     collection_id = crud_collections.create_collection(collection_data=collection)
     assert PyObjectId.is_valid(collection_id)
+
+    new_collection = updated_collection
+    new_collection['collection_id'] = collection_id
 
     response = crud_collections.update_collection(collection_id=collection_id, updated_data=updated_collection)
     assert response["message"] == "Collection updated successfully"
@@ -183,7 +178,7 @@ def test_get_all_collections():
 
     response = crud_collections.get_all_collections()
     for item in response:
-        assert str(item.id) in [collection_id_1, collection_id_2]
+        assert str(item.collection_id) in [collection_id_1, collection_id_2]
     
     assert len(response) == 2
 

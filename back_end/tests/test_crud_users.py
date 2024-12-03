@@ -4,6 +4,7 @@ import pytest
 from flask import Flask
 from config import TestingConfig
 from app.utils import PyObjectId
+from app.utils.enums import UpdateType
 from app.schemas import User
 
 user = { "username": "username_1",
@@ -11,18 +12,12 @@ user = { "username": "username_1",
         "recipe_ids": ["673939cf5a425b66cc8c3dd2", "672af6cd3d7885e1b7eaf6d4"]}
 user_2 = { "username": "username_2",
         "recipe_ids": ["672af6cd3d7885e1b7eaf6d4"]}
+new_user = {"username": "username_3"}
 bad_user = {"recipe_ids": ["673939cf5a425b66cc8c3dd2", "672af6cd3d7885e1b7eaf6d4", "673939ba7cb7a2ab4a91f6fa"]}
 updated_user = {"username": "new_username",
                 "collection_ids": [],
                 "recipe_ids": ["673939cf5a425b66cc8c3dd2", "672af6cd3d7885e1b7eaf6d4", "673939ba7cb7a2ab4a91f6fa"]}
 
-app = Flask(__name__)
-app.config.from_object(TestingConfig)
-
-@pytest.fixture
-def client():
-    with app.test_client() as client:
-        yield client
         
 def test_create_user():
     # Test correct insertion
@@ -64,6 +59,9 @@ def test_update_user():
     user_id = crud_users.create_user(user_data=user)
     assert PyObjectId.is_valid(user_id)
 
+    new_user = updated_user
+    new_user['user_id'] = user_id
+
     response = crud_users.update_user(user_id=user_id, updated_data=updated_user)
     assert response["message"] == "User updated successfully"
 
@@ -80,6 +78,29 @@ def test_fail_update_user():
         crud_users.update_user(user_id=user_id, updated_data=bad_user)
 
     assert "username" and "field required" in str(exc_info.value)
+
+def test_update_user_upon_item_creation():
+    # Test correct update user upon item creation
+    crud_users.delete_all_users()
+    user_id = crud_users.create_user(user_data=new_user)
+    assert PyObjectId.is_valid(user_id)
+
+    item_id = "673939ba7cb7a2ab4a91f6fa"
+
+    response = crud_users.update_user_upon_item_creation(user_id=user_id, item_id=item_id, update_type=UpdateType.RECIPE)
+    assert response["message"] == "User updated successfully"
+
+    response = crud_users.get_user_by_id(user_id=user_id)
+    assert response.recipe_ids == ["673939ba7cb7a2ab4a91f6fa"]
+    assert response.collection_ids == None
+
+    response = crud_users.update_user_upon_item_creation(user_id=user_id, item_id=item_id, update_type=UpdateType.COLLECTION)
+    assert response["message"] == "User updated successfully"
+
+    response = crud_users.get_user_by_id(user_id=user_id)
+    assert response.collection_ids == ["673939ba7cb7a2ab4a91f6fa"]
+    assert response.recipe_ids == ["673939ba7cb7a2ab4a91f6fa"]
+
 
 def test_delete_user():
     # Test correct delete
@@ -127,7 +148,7 @@ def test_get_all_users():
 
     response = crud_users.get_all_users()
     for item in response:
-        assert str(item.id) in [user_id_1, user_id_2]
+        assert str(item.user_id) in [user_id_1, user_id_2]
     
     assert len(response) == 2
 

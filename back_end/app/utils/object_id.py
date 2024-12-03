@@ -14,6 +14,6 @@ class PyObjectId(ObjectId):
             raise ValueError("Invalid PyObjectId")
         return PyObjectId(v)
 
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+    # @classmethod
+    # def __modify_schema__(cls, field_schema):
+    #     field_schema.update(type="string")

@@ -175,14 +175,6 @@ updated_recipe = {
     "image": "/images/picture.jpg",
     "created_at": "2024-10-18T15:30:00Z"
 }
-
-app = Flask(__name__)
-app.config.from_object(TestingConfig)
-
-@pytest.fixture
-def client():
-    with app.test_client() as client:
-        yield client
         
 def test_create_recipe():
     # Test correct insertion
@@ -242,9 +234,13 @@ def test_update_recipe():
     # Test correct update
     crud_recipes.delete_all_recipes()
     recipe_id = crud_recipes.create_recipe(recipe=recipe)
+
+    new_recipe = updated_recipe
+    new_recipe['recipe_id'] = recipe_id
+
     assert PyObjectId.is_valid(recipe_id)
 
-    response = crud_recipes.update_recipe(recipe_id=recipe_id, updated_data=updated_recipe)
+    response = crud_recipes.update_recipe(recipe_id=recipe_id, updated_data=new_recipe)
     assert response["message"] == "Recipe updated successfully"
 
     response = crud_recipes.get_recipe_by_id(recipe_id=recipe_id)
@@ -301,14 +297,14 @@ def test_get_all_recipes():
     # Test correct retrieval of all recipes
     crud_recipes.delete_all_recipes()
     recipe_id_1 = crud_recipes.create_recipe(recipe=recipe)
-    recipe_id_2 = crud_recipes.create_recipe(recipe=updated_recipe)
+    recipe_id_2 = crud_recipes.create_recipe(recipe=recipe_2)
 
     assert PyObjectId.is_valid(recipe_id_1)
     assert PyObjectId.is_valid(recipe_id_2)
 
     response = crud_recipes.get_all_recipes()
     for item in response:
-        assert str(item.id) in [recipe_id_1, recipe_id_2]
+        assert str(item.recipe_id) in [recipe_id_1, recipe_id_2]
     
     assert len(response) == 2
 
@@ -331,7 +327,7 @@ def test_get_multiple_recipes_by_id():
 
     response = crud_recipes.get_many_recipes_by_id(recipe_ids=[recipe_id_1, recipe_id_2])
     for item in response:
-        assert str(item.id) in [recipe_id_1, recipe_id_2]
+        assert str(item.recipe_id) in [recipe_id_1, recipe_id_2]
     
     response = sorted(response, key=lambda item: item.title)
     assert response[0].title == "Pasta Primavera"

@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
-from app.crud import crud_collections
+from app.crud import crud_collections, crud_users
 from pymongo.errors import PyMongoError
 from app.schemas import Collection
 from typing import List
+from app.utils.enums import UpdateType
 
 # Define a Blueprint for the 'collections' routes
 collections_bp = Blueprint('collections', __name__)
@@ -11,13 +12,18 @@ collections_bp = Blueprint('collections', __name__)
 @collections_bp.route('', methods=['POST'])
 def create_new_collection():
     try:
-        data = request.json
-        collection = Collection(**data)
+        collection = request.json
 
         if not collection:
             raise Exception("Invalid input: No data provided", 400)
 
-        collection_id = crud_collections.create_collection(collection=collection)
+        collection_id = crud_collections.create_collection(collection_data=collection)
+
+        try:
+            crud_users.update_user_upon_item_creation(user_id=collection["user_id"], item_id=collection_id, update_type=UpdateType.COLLECTION)
+        except Exception as e:
+            print(f"Error updating user: {str(e)}", 500)
+            raise Exception(f"Error updating user: {str(e)}", 500)
 
         print("collection_id", collection_id)
         return jsonify({"id": collection_id, "message": "Collection created successfully"})
@@ -33,8 +39,8 @@ def create_new_collection():
 @collections_bp.route('/<collection_id>', methods=['GET'])
 def get_collection(collection_id: str):
     try:
-        collection = crud_collections.get_collection_by_id(collection_id=collection_id)
-        return jsonify(collection)
+        collection = crud_collections.get_collection_by_id(collections_id=collection_id)
+        return collection.json()
 
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)
@@ -48,9 +54,7 @@ def get_collection(collection_id: str):
 def get_all_collections_for_user(user_id: str):
     try:
         collections = crud_collections.get_all_collections_by_user(user_id=user_id)
-        print("Collections", collections)
-
-        return jsonify(collections)
+        return [collection.json() for collection in collections]
     
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)
@@ -64,9 +68,8 @@ def get_all_collections_for_user(user_id: str):
 def get_all_collections():
     try:
         collections = crud_collections.get_all_collections()
-        print("Collections", collections)
 
-        return jsonify(collections)
+        return [collection.json() for collection in collections]
     
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)
@@ -79,13 +82,11 @@ def get_all_collections():
 @collections_bp.route('/<collection_id>', methods=['PUT'])
 def update_existing_collection(collection_id: str):
     try:
-        data = request.json
-        collection = Collection(**data)
-
+        collection = request.json
         if not collection:
             raise Exception("Invalid input: No data provided", 400)
 
-        response = crud_collections.update_collection(collection_id=collection_id, collection=collection)
+        response = crud_collections.update_collection(collection_id=collection_id, updated_data=collection)
         return jsonify(response)
 
     except PyMongoError as e:

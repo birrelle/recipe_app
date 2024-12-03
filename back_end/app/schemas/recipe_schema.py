@@ -7,10 +7,13 @@ from app.schemas.section_schema import Section
 from datetime import datetime, timezone
 from app.utils import PyObjectId
 from bson import ObjectId
+import json
+
 
 # Define the Recipe schema using Pydantic
 class Recipe(BaseModel):
-    id: PyObjectId = Field(alias='_id', default_factory=PyObjectId)
+    # _id: PyObjectId = Field(default_factory=PyObjectId)
+    recipe_id: PyObjectId = Field(default_factory=PyObjectId)
     title: str
     user_id: PyObjectId
     source: Optional[str] = Field(None, min_length=1, description="Where the recipe came from")
@@ -30,7 +33,8 @@ class Recipe(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         use_enum_values = True  
-        json_encoders = {ObjectId: str}
+        json_encoders = {PyObjectId: str}
+        populate_by_name = True
         schema_extra = {
             "example": {
                 "title": "Pasta Primavera",
@@ -82,3 +86,10 @@ class Recipe(BaseModel):
                 "created_at": "2024-10-18T15:30:00Z"
             }
         }
+    # def dict(self, **kwargs):
+    #     data = super().dict(**kwargs)
+    #     data['_id'] = str(self.id)
+    #     return data
+
+    # def json(self, **kwargs):
+    #     return json.dumps(self.dict())

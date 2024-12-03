@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables
-load_dotenv()
+env = os.getenv("FLASK_ENV")
+dotenv_file = f".env.{env}"
+load_dotenv(dotenv_file)
 
 # MongoDB connection settings
 MONGO_URI = os.getenv("MONGO_URI")  
@@ -11,6 +13,7 @@ DB_NAME = os.getenv("DB_NAME")
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
+
 
 # Collections
 users_collection = db["users"]

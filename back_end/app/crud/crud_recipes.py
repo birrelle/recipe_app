@@ -19,6 +19,9 @@ def create_recipe(recipe: Recipe) -> str:
             print(f"Invalid Recipe object")
             raise ValueError(e)
         
+        recipe_id = ObjectId()
+        recipe.recipe_id = recipe_id
+
         recipe = recipe.dict()
         recipe["course"] = list(recipe["course"])
 
@@ -27,7 +30,7 @@ def create_recipe(recipe: Recipe) -> str:
         if not result.inserted_id:
             raise Exception("Failed to insert recipe", 500)
 
-        return str(result.inserted_id)
+        return str(recipe_id)
 
     except PyMongoError as e:
         print(f"MongoDB insertion error: {e}")
@@ -39,12 +42,13 @@ def get_recipe_by_id(recipe_id: str) -> Recipe:
     try:
         if not PyObjectId.is_valid(recipe_id):
             raise Exception("Invalid recipe ID", 400)
-    
-        recipe = recipes_collection.find_one({"_id": PyObjectId(recipe_id)})
+        #CHANGE ME
+        recipe = recipes_collection.find_one({"recipe_id": PyObjectId(recipe_id)})
+        # recipe = recipes_collection.find_one({"id": PyObjectId(recipe_id)})
         if not recipe:
             raise Exception("Recipe not found", 404)
-
         # recipe["id"] = str(recipe["id"])  # Convert PyObjectId to string for JSON serialization
+        # recipe['_id'] = recipe.pop("id")
         return Recipe(**recipe)
 
     except PyMongoError as e:
@@ -63,6 +67,7 @@ def get_all_recipes_by_user(user_id: str) -> List[Recipe]:
         for recipe in cursor:
             # recipe['id'] = str(recipe['id'])
             # recipe['user_id'] = str(recipe['user_id'])
+            # recipe['_id'] = recipe.pop("id")
             recipe = Recipe(**recipe)
             recipes.append(recipe)
         
@@ -81,12 +86,15 @@ def get_many_recipes_by_id(recipe_ids: List[str]) -> List[Recipe]:
                 raise Exception("Invalid recipe ID", 400)
             object_ids.append(PyObjectId(recipe_id))
         
-        cursor = recipes_collection.find({"_id": {"$in": object_ids}})
+        #CHANGE ME
+        cursor = recipes_collection.find({"recipe_id": {"$in": object_ids}})
+        # cursor = recipes_collection.find({"id": {"$in": object_ids}})
         
         recipes = []
         for recipe in cursor:
             # recipe['id'] = str(recipe['id'])
             # recipe['user_id'] = str(recipe['user_id'])
+            # recipe['_id'] = recipe.pop("id")
             recipe = Recipe(**recipe)
             recipes.append(recipe)
         
@@ -108,6 +116,7 @@ def get_all_recipes() -> List[Recipe]:
         for recipe in cursor:
             # recipe['id'] = str(recipe['id'])
             # recipe['user_id'] = str(recipe['user_id'])
+            # recipe['_id'] = recipe.pop("id")
             recipe = Recipe(**recipe)
 
             recipes.append(recipe)
@@ -147,6 +156,7 @@ def search_recipes(
         for recipe in list(cursor):
             # recipe['id'] = str(recipe['id'])
             # recipe['user_id'] = str(recipe['user_id'])
+            # recipe['_id'] = recipe.pop("id")
             recipe = Recipe(**recipe)
             recipes.append(recipe)
             
@@ -163,11 +173,15 @@ def update_recipe(recipe_id: str, updated_data: Recipe) -> str:
 
         if not PyObjectId.is_valid(recipe_id):
             raise Exception("Invalid recipe ID", 400)
-
+        #CHANGE ME
         result = recipes_collection.update_one(
-            {"_id": PyObjectId(recipe_id)},
+            {"recipe_id": PyObjectId(recipe_id)},
             {"$set": updated_data.dict()}
         )
+        # result = recipes_collection.update_one(
+        #     {"id": PyObjectId(recipe_id)},
+        #     {"$set": updated_data.dict()}
+        # )
         if result.matched_count == 0:
             raise Exception("Recipe not found", 404)
         
@@ -183,7 +197,9 @@ def delete_recipe(recipe_id: str):
         if not PyObjectId.is_valid(recipe_id):
             raise Exception("Invalid recipe ID", 400)
 
-        result = recipes_collection.delete_one({"_id": PyObjectId(recipe_id)})
+        #CHANGE ME
+        result = recipes_collection.delete_one({"recipe_id": PyObjectId(recipe_id)})
+        # result = recipes_collection.delete_one({"id": PyObjectId(recipe_id)})
         if result.deleted_count == 0:
             raise Exception("Recipe not found", 404)
 

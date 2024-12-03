@@ -3,6 +3,7 @@ from pymongo.errors import PyMongoError
 from typing import List
 from app.schemas import Collection
 from app.utils import PyObjectId
+from bson import ObjectId
 
 # CRUD Operations for Collections
 
@@ -15,12 +16,15 @@ def create_collection(collection_data: Collection) -> str:
             print(f"Invalid Collection object")
             raise ValueError(e)
 
+        collection_id = ObjectId()
+        collection_data.collection_id = collection_id
+
         result = collections_collection.insert_one(collection_data.dict())
         if not result.inserted_id:
             raise Exception("Failed to insert collection", 500)
 
 
-        return str(result.inserted_id)
+        return str(collection_id)
 
     except PyMongoError as e:
         print(f"MongoDB insertion error: {e}")
@@ -33,7 +37,7 @@ def get_collection_by_id(collections_id: str) -> Collection:
         if not PyObjectId.is_valid(collections_id):
             raise Exception("Invalid collection ID", 400)
         
-        collection = collections_collection.find_one({"_id": PyObjectId(collections_id)})
+        collection = collections_collection.find_one({"collection_id": PyObjectId(collections_id)})
         if not collection:
             raise Exception("Collection not found", 404)
         
@@ -75,7 +79,7 @@ def get_many_collections_by_id(collection_ids: List[str]) -> List[Collection]:
                 raise Exception("Invalid collection ID", 400)
             object_ids.append(PyObjectId(collection_id))
         
-        cursor = collections_collection.find({"_id": {"$in": object_ids}})
+        cursor = collections_collection.find({"collection_id": {"$in": object_ids}})
         
         collections = []
         for collection in cursor:
@@ -121,7 +125,7 @@ def update_collection(collection_id: str, updated_data: Collection):
             raise Exception("Invalid collection ID", 400)
         
         result = collections_collection.update_one(
-            {"_id": PyObjectId(collection_id)},
+            {"collection_id": PyObjectId(collection_id)},
             {"$set": updated_data.dict()}
         )
         if result.matched_count == 0:
@@ -139,7 +143,7 @@ def delete_collection(collection_id: str):
         if not PyObjectId.is_valid(collection_id):
             raise Exception("Invalid collection ID", 400)
         
-        result = collections_collection.delete_one({"_id": PyObjectId(collection_id)})
+        result = collections_collection.delete_one({"collection_id": PyObjectId(collection_id)})
         if result.deleted_count == 0:
             raise Exception("Collection not found", 404)
         

@@ -3,16 +3,19 @@ from .routes import recipes_bp, users_bp, collections_bp
 from .database import *
 from .schemas import *
 from .utils import *
-from config import config
+from config import config_by_name
 from flask import Flask
 from flask_cors import CORS
 import os
+from flask_pymongo import PyMongo
 
+mongo = PyMongo()
 
-def create_app(config_name):
+def create_app(config_name="dev"):
     app = Flask(__name__)
     CORS(app)
-    app.config.from_object(config[config_name])
+    app.config.from_object(config_by_name[config_name])
+    mongo.init_app(app)
 
     # Initialize the database
     # database.db.init_app(app)
@@ -24,4 +27,4 @@ def create_app(config_name):
 
     return app
 
-app = create_app(os.getenv('FLASK_ENV', 'default'))
+# app = create_app()

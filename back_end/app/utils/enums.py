@@ -16,6 +16,10 @@ class SearchType(Enum):
     RECIPE = "Recipe"
     INGREDIENT = "Ingredient"
 
+class UpdateType(Enum):
+    RECIPE = "Recipe"
+    COLLECTION = "Collection"
+
 # class Ing_unit(Enum):
 #     CUP = "Cup"
 #     TEASPOON = "Teaspoon"

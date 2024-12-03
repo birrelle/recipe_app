@@ -10,13 +10,12 @@ users_bp = Blueprint('users', __name__)
 @users_bp.route('', methods=['POST'])
 def create_new_user():
     try:
-        data = request.json
-        user = User(**data)
+        user = request.json
 
         if not user:
             raise Exception("Invalid input: No data provided", 400)
 
-        user_id = crud_users.create_user(user=user)
+        user_id = crud_users.create_user(user_data=user)
 
         print("user_id", user_id)
         return jsonify({"id": user_id, "message": "User created successfully"})
@@ -33,7 +32,7 @@ def create_new_user():
 def get_user(user_id: str):
     try:
         user = crud_users.get_user_by_id(user_id=user_id)
-        return jsonify(user)
+        return user.json()
 
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)
@@ -47,9 +46,8 @@ def get_user(user_id: str):
 def get_all_users():
     try:
         users = crud_users.get_all_users()
-        print("Users", users)
 
-        return jsonify(users)
+        return [user.json() for user in users]
     
     except PyMongoError as e:
         print(f"Database error occurred: {str(e)}", 500)
@@ -62,13 +60,12 @@ def get_all_users():
 @users_bp.route('/<user_id>', methods=['PUT'])
 def update_existing_user(user_id: str):
     try:
-        data = request.json
-        user = User(**data)
+        user = request.json
 
         if not user:
             raise Exception(f"Invalid input: No data provided", 400)
 
-        response = crud_users.update_user(user_id=user_id, user=user)
+        response = crud_users.update_user(user_id=user_id, updated_data=user)
         return jsonify(response)
 
     except PyMongoError as e:
@@ -77,6 +74,7 @@ def update_existing_user(user_id: str):
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}", 500)
         raise Exception(f"An unexpected error occurred: {str(e)}", 500)
+
 
 # DELETE user by ID endpoint
 @users_bp.route('/<user_id>', methods=['DELETE'])

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from app.utils import PyObjectId
 
 class Collection(BaseModel):
-    id: PyObjectId = Field(alias='_id', default_factory=PyObjectId)
+    collection_id: PyObjectId = Field(default_factory=PyObjectId)
     name: str = Field(..., min_length=1, max_length=100, description="Name of the recipe")
     user_id: PyObjectId
     recipe_ids: Optional[List[str]] = Field(None, min_length=1, description="Where the recipe came from")
