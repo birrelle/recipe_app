@@ -1,12 +1,13 @@
 from flask import Flask, request
 from pymongo import MongoClient, ASCENDING
 from flask_cors import CORS
-from app.routes import recipes_bp, users_bp, collections_bp
+from app.routes import auth_bp, recipes_bp, users_bp, collections_bp
 import os
 import sys
 from pathlib import Path
 from app import create_app
 from dotenv import load_dotenv
+
 
 # Load the environment variable for the Flask app
 # Load the appropriate .env file

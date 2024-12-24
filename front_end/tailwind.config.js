@@ -13,7 +13,8 @@ module.exports = {
         white: "#ffffff",
         "custom-darkblue": "#2d3f5d",
         "custom-blue": "#718096",
-        "custom-lightblue": "#aab3c0"
+        "custom-lightblue": "#aab3c0",
+        "custom-lightest-blue": "#e7ebef"
       },
       boxShadow: {
         'lg': '4px 4px 6px rgba(113,128,150,0.5)',

@@ -47,6 +47,20 @@ def get_user_by_id(user_id: str) -> User:
     except PyMongoError as e:
         print(f"MongoDB retrieval error: {e}")
         raise PyMongoError("An error occurred while retrieving the recipe", 500)
+    
+# READ: Get a user by username
+def get_user_by_username(username: str) -> User:
+    try:        
+        user = users_collection.find_one({"username": username})
+        if not user:
+            return None
+        
+        return User(**user)
+
+    except PyMongoError as e:
+        print(f"MongoDB retrieval error: {e}")
+        raise PyMongoError("An error occurred while retrieving the recipe", 500)
+    
 
 # READ: Get all users
 def get_all_users() -> List[User]:

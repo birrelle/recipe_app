@@ -86,3 +86,46 @@ export FLASK_DEBUG=1
 flask run
 
 Flask should now be running at http://127.0.0.1:5000 by default.
+
+# Run all tests
+python -m pytest
+
+# Run specific test file
+python -m pytest tests/test_routes.py
+python -m pytest tests/test_crud.py
+
+# Run tests with verbose output
+python -m pytest -v
+
+# Run tests with coverage
+python -m pytest --cov=app
+
+# Generate detailed coverage HTML report
+python -m pytest --cov=app --cov-report=html
+
+# Generate coverage report in terminal
+python -m pytest --cov=app --cov-report=term-missing
+
+# Run tests matching a name pattern
+python -m pytest -k "test_create"
+
+# Run a specific test function
+python -m pytest tests/test_crud.py::TestCRUD::test_create_recipe
+
+# Stop on first failure
+python -m pytest -x
+
+# Show print statements during tests
+python -m pytest -s
+
+# Show extra test information
+python -m pytest -v --full-trace
+
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = -v --cov=app --cov-report=term-missing
+
+use recipe_app_db

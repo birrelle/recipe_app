@@ -41,6 +41,21 @@ def get_user(user_id: str):
         print(f"An unexpected error occurred: {str(e)}", 500)
         raise Exception(f"An unexpected error occurred: {str(e)}", 500)
 
+# READ user by username endpoint
+@users_bp.route('/username', methods=['GET'])
+def get_user_by_username():
+    try:
+        username = request.json['username']
+        user = crud_users.get_user_by_username(username=username)
+        return user.json()
+
+    except PyMongoError as e:
+        print(f"Database error occurred: {str(e)}", 500)
+        raise PyMongoError(f"Database error occurred: {str(e)}", 500)
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", 500)
+        raise Exception(f"An unexpected error occurred: {str(e)}", 500)
+
 # READ all users
 @users_bp.route('/all', methods=['GET'])
 def get_all_users():
